@@ -37,4 +37,23 @@ export class ActionSheetService {
     const { data } = await actionSheet.onDidDismiss();
     return data?.action;
   }
+
+  showUpdateConfirmation = async (): Promise<string> =>
+    await this.showActionSheet({
+      header: 'Update Available',
+      subHeader: 'An update is available for installation. Would you like to update now? Unsaved changes will be lost!',
+      buttons: [
+        {
+          text: 'Update',
+          data: { action: 'update' },
+          icon: 'refresh-outline',
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          data: { action: 'cancel' },
+          icon: 'close',
+        },
+      ],
+    });
 }
