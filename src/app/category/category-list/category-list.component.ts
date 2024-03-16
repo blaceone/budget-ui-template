@@ -4,7 +4,7 @@ import { InfiniteScrollCustomEvent, ModalController, RefresherCustomEvent } from
 import { Category, CategoryCriteria, SortOption } from '../../shared/domain';
 import { CategoryService } from '../category.service';
 import { ToastService } from '../../shared/service/toast.service';
-import { finalize, Subscription } from 'rxjs';
+import { debounce, finalize, interval, Subscription } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
@@ -25,6 +25,7 @@ export class CategoryListComponent {
     { label: 'Name (A-Z)', value: 'name,asc' },
     { label: 'Name (Z-A)', value: 'name,desc' },
   ];
+  private readonly searchFormSubscription: Subscription;
 
   constructor(
     private readonly modalCtrl: ModalController,
@@ -33,6 +34,12 @@ export class CategoryListComponent {
     private readonly formBuilder: FormBuilder,
   ) {
     this.searchForm = this.formBuilder.group({ name: [], sort: [this.initialSort] });
+    this.searchFormSubscription = this.searchForm.valueChanges
+      .pipe(debounce((value) => interval(value.name?.length ? 400 : 0)))
+      .subscribe((value) => {
+        this.searchCriteria = { ...this.searchCriteria, ...value, page: 0 };
+        this.loadCategories();
+      });
   }
 
   async openModal(category?: Category): Promise<void> {
@@ -76,5 +83,9 @@ export class CategoryListComponent {
   reloadCategories($event?: any): void {
     this.searchCriteria.page = 0;
     this.loadCategories(() => ($event ? ($event as RefresherCustomEvent).target.complete() : {}));
+  }
+
+  ionViewDidLeave(): void {
+    this.searchFormSubscription.unsubscribe();
   }
 }
