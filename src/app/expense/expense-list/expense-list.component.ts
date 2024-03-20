@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, NgIterable } from '@angular/core';
 import { addMonths, set } from 'date-fns';
 import { ModalController } from '@ionic/angular';
 import { ExpenseModalComponent } from '../expense-modal/expense-modal.component';
 import { Expense } from '../../shared/domain';
+import * as vm from 'vm';
 
 @Component({
   selector: 'app-expense-overview',
@@ -16,6 +17,7 @@ export class ExpenseListComponent {
   addMonths = (number: number): void => {
     this.date = addMonths(this.date, number);
   };
+  expenses: (NgIterable<unknown> & NgIterable<any>) | undefined | null;
 
   async openModal(expense?: Expense): Promise<void> {
     const modal = await this.modalCtrl.create({

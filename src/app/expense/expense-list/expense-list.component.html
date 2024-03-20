@@ -1,1 +1,63 @@
-Expense List
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Expenses</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid class="ion-padding">
+    <ion-row>
+      <ion-col size="12" size-sm="4">
+        <ion-item>
+          <ion-label>Date (newest first)</ion-label>
+          <!--<ion-input type="date"></ion-input>-->
+        </ion-item>
+      </ion-col>
+      <ion-col size="12" size-sm="4">
+        <ion-item>
+          <ion-label>Category</ion-label>
+          <ion-select interface="popover">
+            <ion-select-option value="1">Category 1</ion-select-option>
+            <ion-select-option value="2">Category 2</ion-select-option>
+            <ion-select-option value="3">Category 3</ion-select-option>
+            <!-- Add more categories here -->
+          </ion-select>
+        </ion-item>
+      </ion-col>
+      <ion-col size="12" size-sm="4">
+        <ion-item>
+          <ion-label>Search</ion-label>
+          <ion-input type="text" placeholder="Search"></ion-input>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Fab button to add new expense -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+<!-- Footer with formatted date -->
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button>
+        <ion-icon name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ date | date: 'MMMM yyyy' }}</ion-title>
+    <!-- Pfeil nach rechts -->
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="chevron-forward"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
