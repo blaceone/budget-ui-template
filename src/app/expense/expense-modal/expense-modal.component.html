@@ -1,1 +1,49 @@
-Expense Modal
+<ion-header>
+  <ion-toolbar>
+    <ion-title> Add Expense </ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon name="close"></ion-icon>
+        <!-- Cancel Icon -->
+        Cancel
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()">
+        Save
+        <ion-icon slot="start" name="save"></ion-icon>
+        <!-- Save Icon -->
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Icon "Aa" hinzufügen -->
+  <ion-item>
+    <ion-label position="stacked">
+      <ion-icon name="text" slot="start"></ion-icon>
+      Enter the expense name
+    </ion-label>
+    <ion-input type="text" [(ngModel)]="expenseName"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Choose a category</ion-label>
+    <ion-select placeholder="Select category" [(ngModel)]="selectedCategory">
+      <!-- Hier Ihre Kategorien einfügen -->
+    </ion-select>
+  </ion-item>
+
+  <!-- Neues Auswahlfeld für den Betrag in CHF -->
+  <ion-item>
+    <ion-label position="stacked">Enter the amount in CHF</ion-label>
+    <ion-input type="number" [(ngModel)]="expenseAmount"></ion-input>
+  </ion-item>
+
+  <!-- Neues Auswahlfeld für das Datum -->
+  <ion-item>
+    <ion-label position="stacked">Select a date</ion-label>
+    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="selectedDate"></ion-datetime>
+  </ion-item>
+</ion-content>

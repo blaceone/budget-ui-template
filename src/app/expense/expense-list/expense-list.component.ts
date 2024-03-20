@@ -1,9 +1,9 @@
 import { Component, NgIterable } from '@angular/core';
 import { addMonths, set } from 'date-fns';
 import { ModalController } from '@ionic/angular';
+import { Category, Expense } from '../../shared/domain';
+import { CategoryModalComponent } from '../../category/category-modal/category-modal.component';
 import { ExpenseModalComponent } from '../expense-modal/expense-modal.component';
-import { Expense } from '../../shared/domain';
-import * as vm from 'vm';
 
 @Component({
   selector: 'app-expense-overview',
@@ -19,13 +19,17 @@ export class ExpenseListComponent {
   };
   expenses: (NgIterable<unknown> & NgIterable<any>) | undefined | null;
 
-  async openModal(expense?: Expense): Promise<void> {
+  async openModal(category?: Category): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: ExpenseModalComponent,
-      componentProps: { expense: expense ? { ...expense } : {} },
+      componentProps: { category: category ? { ...category } : {} },
     });
     modal.present();
     const { role } = await modal.onWillDismiss();
-    console.log('role', role);
+    if (role === 'refresh') this.reloadCategories();
   }
+
+  private reloadCategories() {}
+
+  showCategoryModal() {}
 }

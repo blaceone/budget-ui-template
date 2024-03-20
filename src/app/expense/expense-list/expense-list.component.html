@@ -38,7 +38,7 @@
 
   <!-- Fab button to add new expense -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button>
+    <ion-fab-button (click)="openModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -58,6 +58,7 @@
       <ion-button>
         <ion-icon name="chevron-forward"></ion-icon>
       </ion-button>
+      <button (click)="openModal()">+</button>
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>

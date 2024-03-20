@@ -9,6 +9,10 @@ import { ActionSheetService } from '../../shared/service/action-sheet.service';
   templateUrl: './expense-modal.component.html',
 })
 export class ExpenseModalComponent {
+  selectedCategory: any;
+  selectedDate: any;
+  expenseAmount: any;
+  expenseName: any;
   constructor(
     private readonly actionSheetService: ActionSheetService,
     private readonly modalCtrl: ModalController,
@@ -34,4 +38,6 @@ export class ExpenseModalComponent {
     const { role } = await categoryModal.onWillDismiss();
     console.log('role', role);
   }
+
+  openDatePicker() {}
 }
