@@ -1,10 +1,10 @@
 <ion-header>
   <ion-toolbar>
+    <ion-progress-bar *ngIf="submitting" type="indeterminate"></ion-progress-bar>
     <ion-title> Add Expense </ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="cancel()">
-        <ion-icon name="close"></ion-icon>
-        <!-- Cancel Icon -->
+      <ion-button (click)="cancel()" [disabled]="submitting">
+        <ion-icon slot="start" name="close"></ion-icon>
         Cancel
       </ion-button>
     </ion-buttons>
@@ -31,7 +31,10 @@
   <ion-item>
     <ion-label position="stacked">Choose a category</ion-label>
     <ion-select placeholder="Select category" [(ngModel)]="selectedCategory">
-      <!-- Hier Ihre Kategorien einfügen -->
+      <<ion-select-option *ngFor="let category of categories" [value]="category.id">{{
+        category.name
+      }}</ion-select-option
+      >!-- Hier Ihre Kategorien einfügen -->
     </ion-select>
   </ion-item>
 
