@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { filter, from } from 'rxjs';
-import { CategoryModalComponent } from '../../category/category-modal/category-modal.component';
 import { ActionSheetService } from '../../shared/service/action-sheet.service';
 import { Category } from '../../shared/domain';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ExpensesService } from '../expenses.service';
 import { ToastService } from '../../shared/service/toast.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { formatISO, parseISO } from 'date-fns';
+import { CategoryModalComponent } from '../../category/category-modal/category-modal.component';
 
 @Component({
   selector: 'app-expense-modal',
@@ -16,12 +15,12 @@ import { formatISO, parseISO } from 'date-fns';
 export class ExpenseModalComponent {
   expenseForm: FormGroup;
   submitting: boolean = false;
-  categories: Category[] = [];
-  private categoryService: any;
-  expenseName: any;
-  selectedCategory: any;
-  expenseAmount: any;
-  selectedDate: any;
+  categories: Category[] = [
+    { id: '1', name: 'Food' },
+    { id: '2', name: 'Transport' },
+    { id: '3', name: 'Shopping' },
+  ];
+  expense: any; // Die zu bearbeitende Ausgabe
 
   constructor(
     private readonly actionSheetService: ActionSheetService,
@@ -31,6 +30,7 @@ export class ExpenseModalComponent {
     private readonly toastService: ToastService,
   ) {
     this.expenseForm = this.formBuilder.group({
+      id: [null], // ID der Ausgabe für den Bearbeitungsmodus
       name: ['', Validators.required],
       category: [null],
       amount: ['', [Validators.required, Validators.min(0)]],
@@ -60,10 +60,19 @@ export class ExpenseModalComponent {
     }
   }
 
-  delete(): void {
-    from(this.actionSheetService.showDeletionConfirmation('Are you sure you want to delete this expense?'))
-      .pipe(filter((action) => action === 'delete'))
-      .subscribe(() => this.modalCtrl.dismiss(null, 'delete'));
+  async deleteExpense(): Promise<void> {
+    const confirmed = await this.actionSheetService.showDeletionConfirmation(
+      'Are you sure you want to delete this expense?',
+    );
+    if (confirmed === 'delete' && this.expenseForm.value.id) {
+      try {
+        await this.expenseService.deleteExpense(this.expenseForm.value.id);
+        this.toastService.displaySuccessToast('Expense deleted successfully');
+        this.modalCtrl.dismiss(null, 'delete');
+      } catch (error) {
+        this.toastService.displayErrorToast('Failed to delete expense', error);
+      }
+    }
   }
 
   async showCategoryModal(): Promise<void> {
@@ -74,13 +83,21 @@ export class ExpenseModalComponent {
   }
 
   ionViewWillEnter(): void {
-    this.loadAllCategories();
+    // Hier kannst du bei Bedarf die Kategorien aus einer API laden
   }
 
-  private loadAllCategories(): void {
-    this.categoryService.getAllCategories({ sort: 'name,asc' }).subscribe({
-      next: (categories: Category[]) => (this.categories = categories),
-      error: (error: any) => this.toastService.displayErrorToast('Could not load categories', error),
+  // Funktion zum Öffnen des Modals im Bearbeitungsmodus
+  async editExpense(expense: any): Promise<void> {
+    this.expense = expense; // Setze die aktuelle Ausgabe zum Bearbeiten
+    const { id, name, category, amount, date } = expense;
+    this.expenseForm.patchValue({
+      id,
+      name,
+      category: category?.id, // Setze die Kategorie-ID für das FormControl
+      amount,
+      date: formatISO(parseISO(date)), // Datum formatieren
     });
+    const modal = await this.modalCtrl.create({ component: ExpenseModalComponent });
+    modal.present();
   }
 }

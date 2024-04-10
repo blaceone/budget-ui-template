@@ -1,52 +1,52 @@
 <ion-header>
   <ion-toolbar>
     <ion-progress-bar *ngIf="submitting" type="indeterminate"></ion-progress-bar>
-    <ion-title> Add Expense </ion-title>
+    <ion-title>{{ expense ? 'Edit Expense' : 'Add Expense' }}</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="cancel()" [disabled]="submitting">
         <ion-icon slot="start" name="close"></ion-icon>
         Cancel
       </ion-button>
     </ion-buttons>
-    <ion-buttons slot="end">
+    <ion-buttons slot="end" *ngIf="expense">
+      <ion-button (click)="deleteExpense()">
+        <ion-icon slot="start" name="trash"></ion-icon>
+        Delete
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end" *ngIf="!expense">
       <ion-button (click)="save()">
-        Save
         <ion-icon slot="start" name="save"></ion-icon>
-        <!-- Save Icon -->
+        Save
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <!-- Icon "Aa" hinzufügen -->
   <ion-item>
-    <ion-label position="stacked">
-      <ion-icon name="text" slot="start"></ion-icon>
-      Enter the expense name
-    </ion-label>
-    <ion-input type="text" [(ngModel)]="expenseName"></ion-input>
+    <ion-label position="stacked">Expense Name</ion-label>
+    <ion-input type="text" formControlName="name"></ion-input>
   </ion-item>
 
   <ion-item>
-    <ion-label position="stacked">Choose a category</ion-label>
-    <ion-select placeholder="Select category" [(ngModel)]="selectedCategory">
-      <<ion-select-option *ngFor="let category of categories" [value]="category.id">{{
-        category.name
-      }}</ion-select-option
-      >!-- Hier Ihre Kategorien einfügen -->
+    <ion-label position="stacked">Category</ion-label>
+    <ion-select formControlName="category" placeholder="Select category">
+      <ion-select-option *ngFor="let category of categories" [value]="category.id">
+        {{ category.name }}
+      </ion-select-option>
     </ion-select>
   </ion-item>
 
-  <!-- Neues Auswahlfeld für den Betrag in CHF -->
   <ion-item>
-    <ion-label position="stacked">Enter the amount in CHF</ion-label>
-    <ion-input type="number" [(ngModel)]="expenseAmount"></ion-input>
+    <ion-label position="stacked">Amount (CHF)</ion-label>
+    <ion-input type="number" formControlName="amount"></ion-input>
   </ion-item>
 
-  <!-- Neues Auswahlfeld für das Datum -->
   <ion-item>
-    <ion-label position="stacked">Select a date</ion-label>
-    <ion-datetime displayFormat="DD/MM/YYYY" [(ngModel)]="selectedDate"></ion-datetime>
+    <ion-label position="stacked">Date</ion-label>
+    <ion-datetime displayFormat="DD/MM/YYYY" formControlName="date"></ion-datetime>
   </ion-item>
+
+  <ion-button expand="full" (click)="showCategoryModal()">Add/Edit Category</ion-button>
 </ion-content>
