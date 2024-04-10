@@ -14,6 +14,8 @@ export class ExpensesService {
 
   getExpenses = (
     pagingCriteria: any,
+    searchTerm: any,
+    sortOption: any,
   ): Observable<Page<Expense>> => // Typ von pagingCriteria anpassen, falls nötig
     this.httpClient.get<Page<Expense>>(this.apiUrl, { params: new HttpParams({ fromObject: { ...pagingCriteria } }) });
 

@@ -1,32 +1,61 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ModalController, RefresherCustomEvent, InfiniteScrollCustomEvent } from '@ionic/angular';
+import { Subscription } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { addMonths, set } from 'date-fns';
 import { ExpenseModalComponent } from '../expense-modal/expense-modal.component';
 import { ExpensesService } from '../expenses.service';
 import { Expense, Page } from '../../shared/domain';
 import { ToastService } from '../../shared/service/toast.service';
-import { finalize } from 'rxjs/operators';
 
 interface ExpenseGroup {
   date: string;
   expenses: Expense[];
 }
 
+interface SortOption {
+  label: string;
+  value: string;
+}
+
 @Component({
   selector: 'app-expense-overview',
   templateUrl: './expense-list.component.html',
 })
-export class ExpenseListComponent {
+export class ExpenseListComponent implements OnDestroy {
   date = set(new Date(), { date: 1 });
   expenseGroups: ExpenseGroup[] | null = null;
   loading = false;
   lastPageReached = false;
+  searchForm: FormGroup;
+  sortOptions: SortOption[] = [
+    { label: 'Created at (newest first)', value: 'createdAt,desc' },
+    { label: 'Created at (oldest first)', value: 'createdAt,asc' },
+    { label: 'Name (A-Z)', value: 'name,asc' },
+    { label: 'Name (Z-A)', value: 'name,desc' },
+  ];
+  private searchFormSubscription!: Subscription;
 
   constructor(
     private readonly modalCtrl: ModalController,
     private readonly expenseService: ExpensesService,
     private readonly toastService: ToastService,
-  ) {}
+    private readonly formBuilder: FormBuilder,
+  ) {
+    this.searchForm = this.formBuilder.group({
+      name: [],
+      sort: [this.sortOptions[0].value], // Default sort option
+    });
+
+    this.searchFormSubscription = this.searchForm.valueChanges.subscribe(() => {
+      this.loadExpenses();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.searchFormSubscription.unsubscribe();
+  }
 
   addMonths(number: number): void {
     this.date = addMonths(this.date, number);
@@ -59,10 +88,13 @@ export class ExpenseListComponent {
   }
 
   loadExpenses(completeCallback: () => void = () => {}): void {
+    const searchTerm = this.searchForm.get('name')?.value;
+    const sortOption = this.searchForm.get('sort')?.value;
     const yearMonth = this.date.toISOString().substr(0, 7);
+
     this.loading = true;
     this.expenseService
-      .getExpenses(yearMonth)
+      .getExpenses(yearMonth, searchTerm, sortOption)
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -74,7 +106,7 @@ export class ExpenseListComponent {
           if (Array.isArray(expenses)) {
             this.groupExpenses(expenses);
           } else {
-            // Wenn `expenses` ein `Page<Expense>`-Objekt ist, können Sie hier entsprechende Logik implementieren
+            // Handle Page<Expense> object if needed
           }
         },
         (error) => {
@@ -100,8 +132,7 @@ export class ExpenseListComponent {
   }
 
   loadNextExpensesPage(event: any): void {
-    // You need to implement pagination logic here if your API supports it
-    // For simplicity, I'm assuming it doesn't support pagination in this example
+    // Implement pagination logic if needed
     this.lastPageReached = true; // Assuming this is the last page
     (event as InfiniteScrollCustomEvent).target.complete();
   }
